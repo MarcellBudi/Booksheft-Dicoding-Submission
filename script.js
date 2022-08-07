@@ -48,6 +48,11 @@ function addBook() {
 
   document.dispatchEvent(new Event(RENDER_EVENT));
   saveData();
+  Swal.fire({
+    title: `Berhasil menambahkan Buku "${getTitle}"`, 
+    getTitle, getAuthor,
+    icon: 'success',
+  });
 }
 
 function generateId() {
@@ -57,7 +62,7 @@ function generateId() {
 function generateBookObject(id, title, author, year, isComplete) {
   return {
     id, title, author, year, isComplete
-  };
+  }
 }
 
 function searchBook(judulBuku) {
@@ -171,6 +176,7 @@ function addBookToCompleted(bookId) {
 
   document.dispatchEvent(new Event(RENDER_EVENT));
   saveData();
+  Swal.fire('Menambahkan buku sudah selesai dibaca');
 }
 
 function findBook(bookId) {
@@ -183,19 +189,29 @@ function findBook(bookId) {
 }
 
 function removeBookFromCompleted(bookId) {
-  const isDelete = window.confirm("Apakah yakin ingin menghapus buku ini?");
-  if (isDelete) {
-    const bookTarget = findBookIndex(bookId);
-    const filteredBookTarget = findFilteredBookIndex(bookId);
-    if (bookTarget == -1) return;
-    books.splice(bookTarget, 1);
-    filterBooks.splice(filteredBookTarget, 1);
-    document.dispatchEvent(new Event(RENDER_EVENT));
-    saveData();
-    alert("Buku berhasil dihapus");
-  } else {
-    alert("Buku gagal dihapus");
-  }
+  Swal.fire({
+    title: 'Apakah yakin ingin menghapus buku ini?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Hapus'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const bookTarget = findBookIndex(bookId);
+      const filteredBookTarget = findFilteredBookIndex(bookId);
+      if (bookTarget == -1) return;
+      books.splice(bookTarget, 1);
+      filterBooks.splice(filteredBookTarget, 1);
+      document.dispatchEvent(new Event(RENDER_EVENT));
+      saveData();
+      Swal.fire(
+        'Buku berhasil dihapus',
+        '',
+        'success'
+      );
+    }
+  });
 }
 
 function undoBookFromCompleted(bookId) {
@@ -204,6 +220,7 @@ function undoBookFromCompleted(bookId) {
   bookTarget.isComplete = false;
   document.dispatchEvent(new Event(RENDER_EVENT));
   saveData();
+  Swal.fire('Menambahkan buku belum selesai dibaca');
 }
 
 function findBookIndex(bookId) {
